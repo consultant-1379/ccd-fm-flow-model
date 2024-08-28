@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ******************************************************************************* 
+    * COPYRIGHT Ericsson LMI 2013. All rights reserved. * * No part of this document 
+    may be reproduced in any form without the * written permission of the copyright 
+    owner.The contents of this document * are subject to revision without notice 
+    due to continued progress in * methodology, design and manufacturing. Ericsson 
+    shall have no liability * for any error or damage of any kind resulting from 
+    the use of this document. 
+* ******************************************************************************* -->
+<flow:FlowDefinition oss_common:lifeCycle="CURRENT"
+    oss_common:name="CCDSupervisionAlarmFlow" oss_common:ns="CCD_MED"
+    oss_common:version="1.0.0" synchronicity="SYNCHRONOUS"
+    xmlns:flow="urn:com:ericsson:schema:xml:oss:fbp_flow"
+    xmlns:oss_common="urn:com:ericsson:schema:xml:oss:oss_common"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <oss_common:modelCreationInfo author="chargers"
+        creationDate="06/12/2023">
+        <oss_common:designedModel componentId="CCDSupervisionAlarmFlow-model" />
+    </oss_common:modelCreationInfo>
+
+    <oss_common:desc>Flow for alarm supervision</oss_common:desc>
+
+    <flow:input name="CCDSupervisionAlarmFlow" />
+
+        <flow:step name="SnmpSupervisionRequestHandler">
+        <flow:handlerTypeRef
+            uri="model://MEDIATION/SupervisionRequestHandler/1.0.0" />
+        <flow:attribute name="fdn" source="dps:fdn" />
+        <flow:attribute name="ipAddress" source="conn:ipAddress" />
+        <flow:attribute name="snmpVersion" source="conn:snmpVersion" />
+        <flow:attribute name="snmpReadCommunity" source="conn:snmpReadCommunity" />
+        <flow:attribute name="snmpWriteCommunity" source="conn:snmpWriteCommunity" />
+        <flow:attribute name="snmpSecurityName" source="conn:snmpSecurityName" />
+        <flow:attribute name="snmpSecurityLevel" source="conn:snmpSecurityLevel" />
+        <flow:attribute name="active" source="dps:active" />
+    </flow:step>
+
+    <flow:step name="supervisionRequestHandler">
+        <flow:handlerTypeRef
+            uri="model://ECM_MED/SupervisionRequestHandler/1.0.0" />
+    </flow:step>
+
+    <flow:step name="alarmConsumerFlowHandler">
+        <flow:handlerTypeRef
+            uri="model://MEDIATION/AlarmConsumerFlowHandler/1.0.0" />
+    </flow:step>
+
+    <flow:step name="ConfigHeartBeatHandler">
+        <flow:handlerTypeRef uri="model://MEDIATION/ConfigHeartBeatHandler/1.0.0" />
+        <flow:attribute name="fdn" source="dps:fdn" />
+        <flow:attribute name="ipAddress" source="conn:ipAddress" />
+        <flow:attribute name="snmpVersion" source="conn:snmpVersion" />               
+        <flow:attribute name="snmpReadCommunity" source="conn:snmpReadCommunity" />
+        <flow:attribute name="snmpWriteCommunity" source="conn:snmpWriteCommunity" />
+        <flow:attribute name="snmpSecurityName" source="conn:snmpSecurityName" />
+        <flow:attribute name="snmpSecurityLevel" source="conn:snmpSecurityLevel" />
+        <flow:attribute name="active" source="dps:active" /> 
+        <flow:attribute name="heartbeatTimeout" source="dps:heartbeatTimeout" />
+        <flow:attribute name="heartbeatinterval" source="dps:heartbeatinterval" />
+    </flow:step>
+
+
+    <flow:path>
+        <flow:from uri="direct:CCDSupervisionAlarmFlow" />
+        <flow:to uri="SnmpSupervisionRequestHandler" />
+        <flow:to uri="supervisionRequestHandler" />
+        <flow:to uri="alarmConsumerFlowHandler" />
+        <flow:to uri="ConfigHeartBeatHandler" />
+    </flow:path>
+
+    <flow:capabilities>
+        <flow:requiredCapability name="SNMP" />
+    </flow:capabilities>
+
+</flow:FlowDefinition>
